@@ -23,7 +23,9 @@ QVector<Point *> Source::sampleOrigin()
         float xOffSet = r * qCos(theta) * qSin(phi);
         float yOffSet = r * qSin(theta) * qSin(phi);
         float zOffSet = r * qCos(phi);
-        sources.append(new Point(origin.getX() + xOffSet, origin.getY() + yOffSet, origin.getZ() + zOffSet));
+        Point* p;
+        p = new Point(origin.getX() + xOffSet, origin.getY() + yOffSet, origin.getZ() + zOffSet);
+        sources.append(p);
     }
     return sources;
 }

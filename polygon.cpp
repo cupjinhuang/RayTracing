@@ -2,7 +2,7 @@
 #include <QtCore/qmath.h>
 
 Polygon::Polygon(Point o, Vector x, Vector y, QVector<Point *> p):
-    origin(o), xaxis(x), yaxis(y), points(p), norm(0, 0, 0)
+    origin(o), xaxis(x), yaxis(y), norm(0, 0, 0), points(p)
 {
     norm = *(crossProduct(&xaxis, &yaxis)->normalize());
 }
@@ -17,7 +17,11 @@ float Polygon::intersection(Ray r)
 {
     Point* op = new Point(origin - *(r.getOrigin()));
     float on = innerProduct(op, &norm);
-    delete op;
+    if(op != NULL)
+    {
+        delete op;
+        op = NULL;
+    }
     float bn = innerProduct(r.getDirection(), &norm);
     if((bn <= ITHRE) && (bn >= -ITHRE))
     {

@@ -21,6 +21,7 @@ void Scene::render()
 {
     for(int i = -CWIDTH / 2; i < CWIDTH / 2; i ++)
     {
+        qDebug() << i;
         for(int j = -CHEIGHT / 2; j < CHEIGHT / 2; j ++)
         {
             QVector<Ray*> rSeq = camera->pixelLight(i, j);
@@ -28,12 +29,15 @@ void Scene::render()
             Intensity rgb(0, 0, 0);
             while(!rSeq.empty())
             {
-                Ray* tmp = rSeq.first();
+                Ray* tmp = rSeq.front();
 
                 rgb = rgb + (1.0 / s) * getIntensity(tmp);
                 rSeq.pop_front();
-                delete tmp;
-                tmp = 0;
+                if(tmp != NULL)
+                {
+                    delete tmp;
+                    tmp = NULL;
+                }
             }
             image->setPixel(i + CWIDTH / 2, j + CHEIGHT / 2, rgb.toRGB());
 
@@ -81,23 +85,23 @@ void Scene::initialize()
     Source* s2 = new Source(Point(SWIDTH * 0.5, -SHEIGHT * 1.1, -SDEPTH * 0.6), Intensity(10000, 20000, 60000), 50);
     Source* s3 = new Source(Point(-SWIDTH * 0.5, 0, -SDEPTH * 0.3), Intensity(20000, 4000, 2000), 50);
     sources.append(s1);
-    sources.append(s2);
-    sources.append(s3);
+    //sources.append(s2);
+    //sources.append(s3);
     camera = new Camera(Point(SWIDTH * 0.5, SHEIGHT * 0.5, -SDEPTH * 0.3 - CDEPTH));
-    //camera->rotateX(0.0);
+    camera->rotateY(0.1);
 }
 
 void Scene::sceneMain()
 {
     qDebug() << "now in sceneMain";
     Chessboard* floor = new Chessboard(200, Color(255, 0, 0),
-                                    Point(0, SHEIGHT * 0.8, 0),
+                                    Point(0, SHEIGHT, 0),
                                     Vector(-1, 0, 0), Vector(0, 0, 1),
                                     this,
                                     Color(0, 255, 0),
                                     0.0, 0.7, 0.05, 20, 0, 1);
     Chessboard* background = new Chessboard(200, Color(255, 255, 0),
-                                  Point(0, 0, SDEPTH * 1.5),
+                                  Point(0, 0, SDEPTH),
                                   Vector(1, 0, 0), Vector(0, 1, 0),
                                   this,
                                   Color(128, 128, 255),
@@ -109,7 +113,7 @@ void Scene::sceneMain()
                               this,
                               Color(255, 255, 255),
                               1, 0, 0, 0, 0, 0);
-    models.append(mirror);
+    //models.append(mirror);
     Ball* b2 = new Ball(200,
                         Point(2 * SWIDTH / 3,  2 * SHEIGHT / 3, SDEPTH / 3),
                         this,
@@ -120,18 +124,31 @@ void Scene::sceneMain()
                         this,
                         Color(128, 128, 128),
                         0, 0, 0.1, 50, 0.9, 1.1);
-    models.append(b2);
-    models.append(b3);
+    //models.append(b2);
+    //models.append(b3);
     for(int i = 12; i < 13; i ++)
     {
-        qDebug() << "Now rendering " << i;
         Ball* b1 = new Ball(200,
                             Point(SWIDTH * 0.55, SHEIGHT * 0.45, SDEPTH * (i / 20.0) ),
                             this, Color(255, 255, 255),
                             0.4, 0.2, 0.2, 50, 0, 1.5);
         //models.append(b1);
+        for(int j = 0; j <10 ; j ++)
+        {
+            for(int k = 0; k < 10; k ++)
+            {
+                for(int l = 0; l < 10; l ++)
+                {
+                    Ball *b = new Ball(100, Point(SWIDTH * 0.1 * (j + 0.5), SHEIGHT * 0.1 * (k + 0.5), SDEPTH * 0.1 * (l + 0.5)),
+                                       this, Color(255 * 0.1 * (j + 0.5), 255 * 0.1 * (k + 0.5), 255 * 0.1 * (l + 0.5)),
+                        0, 0, 0.1, 50, 0.9, 1.1);
+                    models.append(b);
+                }
+            }
+        }
         QTime time;
         time.start();
+        qDebug() << "Now rendering " << i;
         render();
         int diff = time.elapsed();
         qDebug() << "Render finished in" << diff / 1000.0 << "seconds.";
@@ -141,23 +158,37 @@ void Scene::sceneMain()
         pixmap.save(str);
         addPixmap(pixmap);
         models.pop_back();
-        delete b1;
-        b1 = 0;
+        if(b1 != NULL)
+        {
+            delete b1;
+            b1 = NULL;
+        }
     }
     qDebug() << "Finished!";
 }
 
 float Scene::getSourceRay(int i, Point* p)
 {
+    Point* oi1 = sources.at(i)->getOrigin();
+    Ray sourceRay(*oi1, *p - *oi1, 0);
+    float f1 = distance(oi1, p);
+    int s1 = models.size();
+    int k1 = 0;
+    for(k1 = 0; k1 < s1; k1 ++)
+    {
+        float s = models.at(k1)->intersection(sourceRay);
+        if((s > THRE * 10) && (f1 - s > THRE * 10)) break;
+    }
+    if(k1 == s1) return 1;
+
     int cnt = 0;
     QVector<Point *> org = sources.at(i)->sampleOrigin();
     int size = org.size();
     for(int j = 0; j < size; j ++)
     {
         Point* oi = org.at(j);
-        Point* op = new Point(*p - *oi);
-        Ray sourceRay(*oi, *op, 0);
-        delete op;
+        Point op = *p - *oi;
+        Ray sourceRay(*oi, op, 0);
         float f = distance(oi, p);
         int s = models.size();
         int k = 0;
@@ -166,26 +197,17 @@ float Scene::getSourceRay(int i, Point* p)
             float s = models.at(k)->intersection(sourceRay);
             if((s > THRE * 10) && (f - s > THRE * 10)) break;
         }
-        if(k == s && j == 0)
-        {
-            while(!org.empty())
-            {
-                Point* first = org.first();
-                org.pop_front();
-                delete first;
-            }
-            return 1;
-        }
-        else
-        {
-            if(k == s) cnt ++;
-        }
+        if(k == s) cnt ++;
     }
     while(!org.empty())
     {
-        Point* first = org.first();
+        Point* first = org.front();
+        if(first != NULL)
+        {
+            delete first;
+            first = NULL;
+        }
         org.pop_front();
-        delete first;
     }
-    return cnt / (size + 0.0);
+    return qMin(2 * cnt / (size + 0.0), 1.0);
 }

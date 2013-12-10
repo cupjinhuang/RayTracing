@@ -3,9 +3,9 @@
 #include "point.h"
 #include "matrix.h"
 #include "ray.h"
-#define CHEIGHT 300
-#define CWIDTH 400
-#define CDEPTH 800
+#define CHEIGHT 600
+#define CWIDTH 800
+#define CDEPTH 500
 
 #define DIVH 1
 #define DIVW 1

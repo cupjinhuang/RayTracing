@@ -10,7 +10,7 @@ public:
     Ball(float, Point, Scene*, Color, float, float, float, float, float, float);
     Ball(const Ball&);
 
-    Vector* normal(Point*);
+    virtual Vector* normal(Point*);
     float intersection(Ray);
     void print();
 

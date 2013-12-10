@@ -7,7 +7,11 @@ Plane::Plane(Point o, Vector x, Vector y, Scene* s, Color c, float rl, float df,
 {
     Point *n = crossProduct(&xaxis, &yaxis)->normalize();
     norm = *n;
-    delete n;
+    if(n != NULL)
+    {
+        delete n;
+        n = NULL;
+    }
 }
 
 Plane::Plane(const Plane & p):
@@ -16,7 +20,10 @@ Plane::Plane(const Plane & p):
 {
     Point *n = crossProduct(&xaxis, &yaxis)->normalize();
     norm = *n;
-    delete n;
+    {
+        delete n;
+        n = NULL;
+    }
 }
 
 Vector* Plane::normal(Point *p)
@@ -26,9 +33,8 @@ Vector* Plane::normal(Point *p)
 
 float Plane::intersection(Ray r)
 {
-    Point* p = new Point(origin - *(r.getOrigin()));
-    float on = innerProduct(p, &norm);
-    delete p;
+    Point p = origin - *(r.getOrigin());
+    float on = innerProduct(&p, &norm);
     float bn = innerProduct(r.getDirection(), &norm);
     if((bn <= ITHRE) && (bn >= -ITHRE))
     {

@@ -75,7 +75,11 @@ Point* reflection(Point* p1, Point* p2)
 {
     Point* proj = projector(p1, p2);
     Point pr2 = -2 * *proj;
-    delete proj;
+    if(proj != NULL)
+    {
+        delete proj;
+        proj = NULL;
+    }
     return new Point(pr2 + *p1);
 }
 
@@ -89,14 +93,23 @@ Point* refraction(Point* p1, Point* p2, float index)
     if(sine >=1)
     {
         //qDebug() << sine;
-        return p2;
+        if(proj != NULL)
+        {
+            delete proj;
+            proj = NULL;
+        }
+        return new Point(*p2);
     }
     else
     {
         //qDebug() << "succ" << sine;
         proj->normalize();
         Point* res = new Point(para + qSqrt(1 - sine * sine) * *proj);
-        delete proj;
+        if(proj != NULL)
+        {
+            delete proj;
+            proj = NULL;
+        }
         return res;
     }
 }

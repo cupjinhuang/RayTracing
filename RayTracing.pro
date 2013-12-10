@@ -41,5 +41,5 @@ HEADERS  += mainwindow.h \
     box.h \
     polygon.h
 
-QMAKE_CXXFLAGS += -pg
-QMAKE_LFLAGS += -pg
+QMAKE_CXXFLAGS += -O3 #-pg
+#QMAKE_LFLAGS += -pg

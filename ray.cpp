@@ -9,7 +9,7 @@ Ray::Ray(const Ray& r): origin(r.origin), direction(r.direction), iteration(r.it
 {
 }
 
-Point *Ray::getPoint(float t)
+Point* Ray::getPoint(float t)
 {
     return new Point(origin + t * direction);
 }
@@ -19,8 +19,16 @@ Ray* Ray::reflectRay(float t, Point* n)
     Point* p = getPoint(t);
     Point* r = reflection(&direction, n);
     Ray* res = new Ray(*p, *r, iteration + 1);
-    delete p;
-    delete r;
+    if(p != NULL)
+    {
+        delete p;
+        p = NULL;
+    }
+    if(r != NULL)
+    {
+        delete r;
+        r = NULL;
+    }
     return res;
 }
 
@@ -42,8 +50,16 @@ Ray* Ray::refractRay(float t, Point* n, float index)
     {
         res = new Ray(*p, *rfr, iteration + 1);
     }
-    delete p;
-    delete rfr;
+    if(p != NULL)
+    {
+        delete p;
+        p = NULL;
+    }
+    if(rfr != NULL)
+    {
+        delete rfr;
+        rfr = NULL;
+    }
     return res;
 }
 
