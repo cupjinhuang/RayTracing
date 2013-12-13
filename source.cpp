@@ -16,7 +16,6 @@ QVector<Point *> Source::sampleOrigin()
     QVector<Point*> sources;
     for(int i = 0; i < SAMPLERATE; i ++)
     {
-        qsrand(qrand());
         float r = (qrand() % PRES) * (variance / (PRES + 0.0));
         float theta = (qrand() % PRES) * ((2 * PI) / PRES);
         float phi = (qrand() % PRES) * (PI / PRES);

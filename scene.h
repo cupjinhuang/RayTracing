@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsItem>
+#include <QColor>
 #include "camera.h"
 #include "intensity.h"
 #include "model.h"
@@ -35,6 +36,7 @@ private:
 
     Camera* camera;
     QImage* image;
+    QRgb** pixels;
     Intensity ambient;
 
     QVector<Model*> models;

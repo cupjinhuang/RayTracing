@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     source.cpp \
     plane.cpp \
     box.cpp \
-    polygon.cpp
+    polygon.cpp \
+    mesh.cpp
 
 HEADERS  += mainwindow.h \
     scene.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     source.h \
     plane.h \
     box.h \
-    polygon.h
+    polygon.h \
+    mesh.h
 
 QMAKE_CXXFLAGS += -O3 #-pg
 #QMAKE_LFLAGS += -pg

@@ -14,6 +14,11 @@ Scene::Scene(QObject *parent):
 {
     setSceneRect(0, 0, CWIDTH, CHEIGHT);
     image = new QImage(CWIDTH, CHEIGHT, QImage::Format_RGB32);
+    pixels = new QRgb*[800];
+    for(int i = 0; i < 800; i ++)
+    {
+        pixels[i] = new QRgb[600];
+    }
     initialize();
 }
 
@@ -39,7 +44,7 @@ void Scene::render()
                     tmp = NULL;
                 }
             }
-            image->setPixel(i + CWIDTH / 2, j + CHEIGHT / 2, rgb.toRGB());
+            pixels[i + CWIDTH / 2][j + CHEIGHT / 2] = rgb.toRGB();
 
         }
 
@@ -81,14 +86,14 @@ Intensity Scene::getIntensity(Ray* r)
 
 void Scene::initialize()
 {
-    Source* s1 = new Source(Point(SWIDTH, -SHEIGHT, -SDEPTH), Intensity(500000), 1000.0);
+    Source* s1 = new Source(Point(SWIDTH / 2, SHEIGHT / 2, SDEPTH / 2), Intensity(5000), 10.0);
     Source* s2 = new Source(Point(SWIDTH * 0.5, -SHEIGHT * 1.1, -SDEPTH * 0.6), Intensity(10000, 20000, 60000), 50);
     Source* s3 = new Source(Point(-SWIDTH * 0.5, 0, -SDEPTH * 0.3), Intensity(20000, 4000, 2000), 50);
     sources.append(s1);
     //sources.append(s2);
     //sources.append(s3);
     camera = new Camera(Point(SWIDTH * 0.5, SHEIGHT * 0.5, -SDEPTH * 0.3 - CDEPTH));
-    camera->rotateY(0.1);
+    camera->rotateZ(-0.1);
 }
 
 void Scene::sceneMain()

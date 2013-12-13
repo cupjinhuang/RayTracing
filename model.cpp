@@ -119,16 +119,11 @@ Intensity Model::render(Ray r)
                 freq = freq;
             }
             Point* o = s->getOrigin();
-            Ray* lt = new Ray(*o, p - *o, 0);
+            Ray lt(*o, p - *o, 0);
             float f2 = distance(&p, o);
-            float diff = -cosine(n, lt->getDirection());
-            Ray* rl = reflectRay(f2, *lt);
+            float diff = -cosine(n, lt.getDirection());
+            Ray* rl = reflectRay(f2, lt);
             float phong = -cosine(r.getDirection(), rl->getDirection());
-            if(lt != NULL)
-            {
-                delete lt;
-                lt = NULL;
-            }
             if(rl != NULL)
             {
                 delete rl;
